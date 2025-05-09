@@ -8,6 +8,7 @@ The application requires a configuration file located at `/etc/container-refresh
 See `sample.container-refresh.toml` for an example structure.
 
 Key configuration options:
+
 - `Token` (string, required): The secret token for authorizing requests.
 - `Containers` (array of strings, required): A list of full Docker image names to pull (e.g., `"docker.io/library/alpine:latest"`).
 - `SystemdServices` (array of strings, required): A list of systemd service names to restart.
@@ -24,6 +25,10 @@ Key configuration options:
     - `401 Unauthorized`: Invalid token.
     - `400 Bad Request`: Malformed JSON or missing token.
     - `500 Internal Server Error`: If any error occurs during container pulling or service restarting.
+
+## Running in NixOS
+
+See [NIX.md](NIX.md) for instructions on how to run container-refresh in NixOS.
 
 ## Setup & Running
 
@@ -43,3 +48,4 @@ Key configuration options:
 ```bash
 go mod tidy
 go run ./cmd/container-refresh/main.go
+```
