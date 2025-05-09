@@ -1,0 +1,28 @@
+# Sample configuration for container-refresh service
+# This file should typically be placed at /etc/container-refresh.toml
+
+# Secret token for authorizing requests to the /update endpoint
+Token = "your-super-secret-token-here"
+
+# List of Docker containers to pull
+# Ensure these are full image names including the registry if not Docker Hub default
+Containers = [
+  "docker.io/library/alpine:latest",
+  "ghcr.io/home-assistant/home-assistant:latest"
+  # Add more containers as needed
+]
+
+# List of systemd services to restart after containers are pulled
+SystemdServices = [
+  "my-app-using-alpine.service",
+  "home-assistant.service"
+  # Add more service names as needed
+]
+
+# Optional: Port for the HTTP server to listen on
+# Default is 8080 if not specified
+# ServerPort = "8080"
+
+# Optional: Container engine executable name
+# Defaults to "docker" if not specified. Can be set to "podman", for example.
+# Executable = "docker"
