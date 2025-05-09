@@ -16,6 +16,8 @@
     alejandra
     nixd
     just
+    nodejs_22
+    uv
   ];
 
   # https://devenv.sh/languages/
