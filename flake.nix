@@ -21,7 +21,7 @@
           version = "0.1.0";
           src = ./.;
 
-          vendorHash = "sha256-CVycV7wxo7nOHm7qjZKfJrIkNcIApUNzN1mSIIwQN0g="; # Use the vendored dependencies
+          vendorHash = null; # No external dependencies
         };
       in {
         packages = {
