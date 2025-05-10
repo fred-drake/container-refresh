@@ -54,9 +54,9 @@
           };
 
           executable = lib.mkOption {
-            type = lib.types.enum ["docker" "podman"];
+            type = lib.types.str;
             default = "docker";
-            description = "Container runtime executable to use (docker or podman).";
+            description = "The exact path to the container runtime to use.";
           };
 
           images = lib.mkOption {
