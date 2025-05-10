@@ -1,5 +1,5 @@
 {
-  description = "Container Refresh - A service to pull container images and restart systemd services";
+  description = "Container Refresh - A service to pull container images and stop containers";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -68,7 +68,7 @@
             description = "Container runtime executable to use (docker or podman).";
           };
 
-          containers = lib.mkOption {
+          images = lib.mkOption {
             type = lib.types.listOf lib.types.attrs;
             default = [];
             description = "List of container configurations to refresh.";
@@ -81,15 +81,13 @@
                           ]'';
           };
 
-          services = lib.mkOption {
-            type = lib.types.listOf lib.types.attrs;
+          containerNames = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
             default = [];
-            description = "List of service configurations to restart after container refresh.";
+            description = "List of container names to stop after pulling images.";
             example = lib.literalExpression ''              [
-                            {
-                              name = "my-service";
-                              restart_command = "systemctl restart my-service";
-                            }
+                            "container1",
+                            "container2"
                           ]'';
           };
 
@@ -159,11 +157,11 @@
                   "PORT=${cfg.port}"
                   "CONTAINER_EXECUTABLE=${cfg.executable}"
                 ]
-                ++ lib.optionals (cfg.containers != []) [
-                  "CONTAINERS=${builtins.toJSON cfg.containers}"
+                ++ lib.optionals (cfg.images != []) [
+                  "CONTAINERS=${builtins.toJSON cfg.images}"
                 ]
-                ++ lib.optionals (cfg.services != []) [
-                  "SERVICES=${builtins.toJSON cfg.services}"
+                ++ lib.optionals (cfg.containerNames != []) [
+                  "CONTAINER_NAMES=${builtins.toJSON cfg.containerNames}"
                 ];
             };
           };

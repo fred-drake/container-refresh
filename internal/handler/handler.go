@@ -9,7 +9,6 @@ import (
 
 	"container-refresh/internal/config"
 	"container-refresh/internal/docker"
-	"container-refresh/internal/systemd"
 )
 
 // UpdateRequest defines the expected JSON body for the /update endpoint.
@@ -64,20 +63,20 @@ func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		containerExecutable = "docker"
 	}
 
-	if err := docker.PullContainers(containerExecutable, h.Config.Containers); err != nil {
-		log.Printf("Error pulling containers: %v", err)
-		http.Error(w, fmt.Sprintf("Failed to pull containers: %v", err), http.StatusInternalServerError)
+	if err := docker.PullContainers(containerExecutable, h.Config.Images); err != nil {
+		log.Printf("Error pulling container images: %v", err)
+		http.Error(w, fmt.Sprintf("Failed to pull container images: %v", err), http.StatusInternalServerError)
 		return
 	}
-	log.Println("All containers pulled successfully.")
+	log.Println("All container images pulled successfully.")
 
-	log.Println("Starting service restart process...")
-	if err := systemd.RestartServices(h.Config.SystemdServices); err != nil {
-		log.Printf("Error restarting services: %v", err)
-		http.Error(w, fmt.Sprintf("Failed to restart services: %v", err), http.StatusInternalServerError)
+	log.Println("Starting container stop process...")
+	if err := docker.StopContainers(containerExecutable, h.Config.ContainerNames); err != nil {
+		log.Printf("Error stopping containers: %v", err)
+		http.Error(w, fmt.Sprintf("Failed to stop containers: %v", err), http.StatusInternalServerError)
 		return
 	}
-	log.Println("All services restarted successfully.")
+	log.Println("All containers stopped successfully.")
 
 	w.WriteHeader(http.StatusOK)
 	fw, err := w.Write([]byte("Update process completed successfully."))

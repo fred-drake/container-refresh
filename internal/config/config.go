@@ -7,24 +7,20 @@ import (
 	"strings"
 )
 
-// Container defines the structure for a container configuration
-type Container struct {
+// Image defines the structure for a container image configuration
+type Image struct {
 	Name         string `json:"name"`
 	Image        string `json:"image"`
 	PullInterval string `json:"pull_interval,omitempty"`
 }
 
-// Service defines the structure for a service configuration
-type Service struct {
-	Name           string `json:"name"`
-	RestartCommand string `json:"restart_command,omitempty"`
-}
+
 
 // Config defines the structure for the application's configuration.
 type Config struct {
 	Token           string      // Token for authentication
-	Containers      []Container // Container configurations
-	SystemdServices []Service   // Service configurations
+	Images          []Image     // Container image configurations
+	ContainerNames  []string    // Container names to stop after pulling images
 	ServerPort      string      // Port to listen on
 	Executable      string      // Container runtime executable (docker or podman)
 }
@@ -52,24 +48,24 @@ func LoadConfig() (*Config, error) {
 		cfg.Executable = "docker" // Default to docker if not specified
 	}
 
-	// Parse containers JSON from environment
-	containersJSON := os.Getenv("CONTAINERS")
-	if containersJSON != "" {
-		var containers []Container
-		if err := json.Unmarshal([]byte(containersJSON), &containers); err != nil {
+	// Parse images JSON from environment
+	imagesJSON := os.Getenv("CONTAINERS")
+	if imagesJSON != "" {
+		var images []Image
+		if err := json.Unmarshal([]byte(imagesJSON), &images); err != nil {
 			return nil, err
 		}
-		cfg.Containers = containers
+		cfg.Images = images
 	}
 
-	// Parse services JSON from environment
-	servicesJSON := os.Getenv("SERVICES")
-	if servicesJSON != "" {
-		var services []Service
-		if err := json.Unmarshal([]byte(servicesJSON), &services); err != nil {
+	// Parse container names JSON from environment
+	containerNamesJSON := os.Getenv("CONTAINER_NAMES")
+	if containerNamesJSON != "" {
+		var containerNames []string
+		if err := json.Unmarshal([]byte(containerNamesJSON), &containerNames); err != nil {
 			return nil, err
 		}
-		cfg.SystemdServices = services
+		cfg.ContainerNames = containerNames
 	}
 
 	return cfg, nil

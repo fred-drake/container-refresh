@@ -9,36 +9,36 @@ import (
 	"container-refresh/internal/config"
 )
 
-// PullContainers iterates through a list of container configurations and pulls them using the specified executable.
-func PullContainers(executable string, containers []config.Container) error {
-	if len(containers) == 0 {
-		log.Println("No containers configured to pull.")
+// PullContainers iterates through a list of container image configurations and pulls them using the specified executable.
+func PullContainers(executable string, images []config.Image) error {
+	if len(images) == 0 {
+		log.Println("No container images configured to pull.")
 		return nil
 	}
 
 	var errorMessages []string
-	log.Printf("Attempting to pull %d container(s) using '%s'.", len(containers), executable)
-	for _, container := range containers {
-		log.Printf("Executing: %s pull %s", executable, container.Image)
-		cmd := exec.Command(executable, "pull", container.Image)
+	log.Printf("Attempting to pull %d container image(s) using '%s'.", len(images), executable)
+	for _, image := range images {
+		log.Printf("Executing: %s pull %s", executable, image.Image)
+		cmd := exec.Command(executable, "pull", image.Image)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			errMsg := fmt.Sprintf("Failed to pull '%s' (name: %s) using '%s': %v. Output: %s", 
-				container.Image, container.Name, executable, err, string(output))
+				image.Image, image.Name, executable, err, string(output))
 			log.Println(errMsg)
 			errorMessages = append(errorMessages, errMsg)
 			// Continue to the next container even if one fails
 			continue
 		}
 		log.Printf("Successfully pulled '%s' (name: %s) using '%s'. Output (last 2 lines):\n%s", 
-			container.Image, container.Name, executable, getLastNLines(string(output), 2))
+			image.Image, image.Name, executable, getLastNLines(string(output), 2))
 	}
 
 	if len(errorMessages) > 0 {
-		return fmt.Errorf("encountered errors pulling one or more containers using '%s':\n%s", 
+		return fmt.Errorf("encountered errors pulling one or more container images using '%s':\n%s", 
 			executable, strings.Join(errorMessages, "\n"))
 	}
-	log.Printf("All configured containers pulled (or attempted to pull) successfully using '%s'.", executable)
+	log.Printf("All configured container images pulled (or attempted to pull) successfully using '%s'.", executable)
 	return nil
 }
 
@@ -49,4 +49,37 @@ func getLastNLines(s string, n int) string {
 		return s
 	}
 	return strings.Join(lines[len(lines)-n:], "\n")
+}
+
+// StopContainers stops containers by their names using the specified executable.
+func StopContainers(executable string, containerNames []string) error {
+	if len(containerNames) == 0 {
+		log.Println("No containers configured to stop.")
+		return nil
+	}
+
+	var errorMessages []string
+	log.Printf("Attempting to stop %d container(s) using '%s'.", len(containerNames), executable)
+	for _, containerName := range containerNames {
+		log.Printf("Executing: %s stop %s", executable, containerName)
+		cmd := exec.Command(executable, "stop", containerName)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			errMsg := fmt.Sprintf("Failed to stop container '%s' using '%s': %v. Output: %s", 
+				containerName, executable, err, string(output))
+			log.Println(errMsg)
+			errorMessages = append(errorMessages, errMsg)
+			// Continue to the next container even if one fails
+			continue
+		}
+		log.Printf("Successfully stopped container '%s' using '%s'. Output (last 2 lines):\n%s", 
+			containerName, executable, getLastNLines(string(output), 2))
+	}
+
+	if len(errorMessages) > 0 {
+		return fmt.Errorf("encountered errors stopping one or more containers using '%s':\n%s", 
+			executable, strings.Join(errorMessages, "\n"))
+	}
+	log.Printf("All configured containers stopped (or attempted to stop) successfully using '%s'.", executable)
+	return nil
 }
