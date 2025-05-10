@@ -5,8 +5,6 @@ import (
 	"log"
 	"os/exec"
 	"strings"
-
-	"container-refresh/internal/config"
 )
 
 // PullContainers iterates through a list of container image tags and pulls them using the specified executable.

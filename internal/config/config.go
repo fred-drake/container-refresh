@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -23,7 +22,7 @@ func LoadConfig() (*Config, error) {
 	// Read token from file
 	tokenFile := os.Getenv("TOKEN_FILE")
 	if tokenFile != "" {
-		tokenData, err := ioutil.ReadFile(tokenFile)
+		tokenData, err := os.ReadFile(tokenFile)
 		if err != nil {
 			return nil, err
 		}
