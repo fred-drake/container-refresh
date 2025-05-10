@@ -9,5 +9,4 @@ devenv.local.nix
 .pre-commit-config.yaml
 
 target/
-container-refresh.toml
 result

@@ -1,10 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  inputs,
-  ...
-}: {
+{pkgs, ...}: {
   # https://devenv.sh/basics/
 
   # https://devenv.sh/packages/
@@ -18,6 +12,10 @@
     just
     nodejs_22
     uv
+    go
+    gopls
+    gotools
+    go-tools
   ];
 
   # https://devenv.sh/languages/

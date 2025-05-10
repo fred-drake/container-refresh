@@ -28,15 +28,6 @@
           container-refresh = container-refresh;
           default = container-refresh;
         };
-
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            go
-            gopls
-            gotools
-            go-tools
-          ];
-        };
       }
     )
     // {
@@ -143,8 +134,8 @@
               PrivateTmp = true;
               PrivateDevices = true;
 
-              # Allow access to container socket and systemd
-              SupplementaryGroups = ["${cfg.executable}" "systemd-journal"];
+              # Allow access to container socket
+              SupplementaryGroups = ["${cfg.executable}"];
               ReadWritePaths = ["/var/run/docker.sock"];
 
               # Environment setup
