@@ -21,7 +21,7 @@
           version = "0.1.0";
           src = ./.;
 
-          vendorHash = null; # No external dependencies
+          vendorHash = "sha256-koD96wwcClbjlD79a5O7KbTuS5OpnkNA/rUNznWwZSc="; # No external dependencies
         };
       in {
         packages = {
@@ -107,7 +107,7 @@
             description = "container-refresh service user";
             home = "/var/lib/container-refresh";
             createHome = true;
-            extraGroups = [ cfg.containerGroup ];
+            extraGroups = [cfg.containerGroup];
           };
 
           users.groups.${cfg.group} = {
