@@ -99,7 +99,6 @@
             description = "Container Refresh Service";
             wantedBy = ["multi-user.target"];
             after = ["network.target"];
-            requires = ["users.target"];
             unitConfig = {
               RequiresMountsFor = "/var/run/docker.sock";
             };
