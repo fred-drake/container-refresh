@@ -9,8 +9,8 @@ import (
 	"container-refresh/internal/config"
 )
 
-// PullContainers iterates through a list of container image configurations and pulls them using the specified executable.
-func PullContainers(executable string, images []config.Image) error {
+// PullContainers iterates through a list of container image tags and pulls them using the specified executable.
+func PullContainers(executable string, images []string) error {
 	if len(images) == 0 {
 		log.Println("No container images configured to pull.")
 		return nil
@@ -18,20 +18,20 @@ func PullContainers(executable string, images []config.Image) error {
 
 	var errorMessages []string
 	log.Printf("Attempting to pull %d container image(s) using '%s'.", len(images), executable)
-	for _, image := range images {
-		log.Printf("Executing: %s pull %s", executable, image.Image)
-		cmd := exec.Command(executable, "pull", image.Image)
+	for _, imageTag := range images {
+		log.Printf("Executing: %s pull %s", executable, imageTag)
+		cmd := exec.Command(executable, "pull", imageTag)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			errMsg := fmt.Sprintf("Failed to pull '%s' (name: %s) using '%s': %v. Output: %s", 
-				image.Image, image.Name, executable, err, string(output))
+			errMsg := fmt.Sprintf("Failed to pull '%s' using '%s': %v. Output: %s", 
+				imageTag, executable, err, string(output))
 			log.Println(errMsg)
 			errorMessages = append(errorMessages, errMsg)
 			// Continue to the next container even if one fails
 			continue
 		}
-		log.Printf("Successfully pulled '%s' (name: %s) using '%s'. Output (last 2 lines):\n%s", 
-			image.Image, image.Name, executable, getLastNLines(string(output), 2))
+		log.Printf("Successfully pulled '%s' using '%s'. Output (last 2 lines):\n%s", 
+			imageTag, executable, getLastNLines(string(output), 2))
 	}
 
 	if len(errorMessages) > 0 {

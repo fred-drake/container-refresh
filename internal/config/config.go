@@ -7,19 +7,10 @@ import (
 	"strings"
 )
 
-// Image defines the structure for a container image configuration
-type Image struct {
-	Name         string `json:"name"`
-	Image        string `json:"image"`
-	PullInterval string `json:"pull_interval,omitempty"`
-}
-
-
-
 // Config defines the structure for the application's configuration.
 type Config struct {
 	Token           string      // Token for authentication
-	Images          []Image     // Container image configurations
+	Images          []string    // Container image tags to pull
 	ContainerNames  []string    // Container names to stop after pulling images
 	ServerPort      string      // Port to listen on
 	Executable      string      // Container runtime executable (docker or podman)
@@ -51,7 +42,7 @@ func LoadConfig() (*Config, error) {
 	// Parse images JSON from environment
 	imagesJSON := os.Getenv("CONTAINERS")
 	if imagesJSON != "" {
-		var images []Image
+		var images []string
 		if err := json.Unmarshal([]byte(imagesJSON), &images); err != nil {
 			return nil, err
 		}

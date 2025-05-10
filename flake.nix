@@ -69,15 +69,12 @@
           };
 
           images = lib.mkOption {
-            type = lib.types.listOf lib.types.attrs;
+            type = lib.types.listOf lib.types.str;
             default = [];
-            description = "List of container configurations to refresh.";
+            description = "List of container image tags to pull.";
             example = lib.literalExpression ''              [
-                            {
-                              name = "my-container";
-                              image = "nginx:latest";
-                              pull_interval = "24h";
-                            }
+                            "docker.io/library/nginx:latest",
+                            "ghcr.io/home-assistant/home-assistant:latest"
                           ]'';
           };
 
