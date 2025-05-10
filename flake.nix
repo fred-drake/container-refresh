@@ -91,12 +91,18 @@
             createHome = true;
           };
 
-          users.groups.${cfg.group} = {};
+          users.groups.${cfg.group} = {
+            name = cfg.group;
+          };
 
           systemd.services.container-refresh = {
             description = "Container Refresh Service";
             wantedBy = ["multi-user.target"];
             after = ["network.target"];
+            requires = ["users.target"];
+            unitConfig = {
+              RequiresMountsFor = "/var/run/docker.sock";
+            };
 
             serviceConfig = {
               ExecStart = "${cfg.package}/bin/container-refresh";
