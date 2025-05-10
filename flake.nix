@@ -96,6 +96,12 @@
             default = "8080";
             description = "Port to listen on.";
           };
+
+          containerGroup = lib.mkOption {
+            type = lib.types.enum ["docker" "podman"];
+            default = "docker";
+            description = "Container runtime group to add the service user to.";
+          };
         };
 
         config = lib.mkIf cfg.enable {
@@ -105,6 +111,7 @@
             description = "container-refresh service user";
             home = "/var/lib/container-refresh";
             createHome = true;
+            extraGroups = [ cfg.containerGroup ];
           };
 
           users.groups.${cfg.group} = {
@@ -135,7 +142,7 @@
               PrivateDevices = true;
 
               # Allow access to container socket
-              SupplementaryGroups = ["${cfg.executable}"];
+              SupplementaryGroups = ["${cfg.containerGroup}"];
               ReadWritePaths = ["/var/run/docker.sock"];
 
               # Environment setup
