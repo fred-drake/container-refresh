@@ -146,10 +146,10 @@
                   "CONTAINER_EXECUTABLE=${cfg.executable}"
                 ]
                 ++ lib.optionals (cfg.images != []) [
-                  "CONTAINERS=${builtins.toJSON cfg.images}"
+                  "CONTAINERS='${builtins.toJSON cfg.images}'"
                 ]
                 ++ lib.optionals (cfg.containerNames != []) [
-                  "CONTAINER_NAMES=${builtins.toJSON cfg.containerNames}"
+                  "CONTAINER_NAMES='${builtins.toJSON cfg.containerNames}'"
                 ];
             };
           };
