@@ -57,10 +57,40 @@
             description = "The container-refresh package to use.";
           };
 
-          configFile = lib.mkOption {
+          tokenFile = lib.mkOption {
             type = lib.types.path;
-            default = "/etc/container-refresh.toml";
-            description = "Path to the configuration file.";
+            description = "Path to the token file containing only the token to be used by the application.";
+          };
+
+          executable = lib.mkOption {
+            type = lib.types.enum ["docker" "podman"];
+            default = "docker";
+            description = "Container runtime executable to use (docker or podman).";
+          };
+
+          containers = lib.mkOption {
+            type = lib.types.listOf lib.types.attrs;
+            default = [];
+            description = "List of container configurations to refresh.";
+            example = lib.literalExpression ''              [
+                            {
+                              name = "my-container";
+                              image = "nginx:latest";
+                              pull_interval = "24h";
+                            }
+                          ]'';
+          };
+
+          services = lib.mkOption {
+            type = lib.types.listOf lib.types.attrs;
+            default = [];
+            description = "List of service configurations to restart after container refresh.";
+            example = lib.literalExpression ''              [
+                            {
+                              name = "my-service";
+                              restart_command = "systemctl restart my-service";
+                            }
+                          ]'';
           };
 
           user = lib.mkOption {
@@ -118,25 +148,25 @@
               PrivateTmp = true;
               PrivateDevices = true;
 
-              # Allow access to Docker socket and systemd
-              SupplementaryGroups = ["podman" "systemd-journal"];
+              # Allow access to container socket and systemd
+              SupplementaryGroups = ["${cfg.executable}" "systemd-journal"];
               ReadWritePaths = ["/var/run/docker.sock"];
 
               # Environment setup
-              Environment = [
-                "CONFIG_PATH=${cfg.configFile}"
-              ];
+              Environment =
+                [
+                  "TOKEN_FILE=${cfg.tokenFile}"
+                  "PORT=${cfg.port}"
+                  "CONTAINER_EXECUTABLE=${cfg.executable}"
+                ]
+                ++ lib.optionals (cfg.containers != []) [
+                  "CONTAINERS=${builtins.toJSON cfg.containers}"
+                ]
+                ++ lib.optionals (cfg.services != []) [
+                  "SERVICES=${builtins.toJSON cfg.services}"
+                ];
             };
           };
-
-          # Create a sample configuration file if it doesn't exist
-          system.activationScripts.container-refresh-config = ''
-            if [ ! -f ${cfg.configFile} ]; then
-              cp ${./sample.container-refresh.toml} ${cfg.configFile}
-              chmod 600 ${cfg.configFile}
-              chown ${cfg.user}:${cfg.group} ${cfg.configFile}
-            fi
-          '';
         };
       };
     };

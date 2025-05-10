@@ -71,13 +71,13 @@ func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("All containers pulled successfully.")
 
-	log.Println("Starting systemd service restart process...")
+	log.Println("Starting service restart process...")
 	if err := systemd.RestartServices(h.Config.SystemdServices); err != nil {
-		log.Printf("Error restarting systemd services: %v", err)
-		http.Error(w, fmt.Sprintf("Failed to restart systemd services: %v", err), http.StatusInternalServerError)
+		log.Printf("Error restarting services: %v", err)
+		http.Error(w, fmt.Sprintf("Failed to restart services: %v", err), http.StatusInternalServerError)
 		return
 	}
-	log.Println("All systemd services restarted successfully.")
+	log.Println("All services restarted successfully.")
 
 	w.WriteHeader(http.StatusOK)
 	fw, err := w.Write([]byte("Update process completed successfully."))
