@@ -12,7 +12,6 @@ type Config struct {
 	Images          []string    // Container image tags to pull
 	ContainerNames  []string    // Container names to stop after pulling images
 	ServerPort      string      // Port to listen on
-	Executable      string      // Container runtime executable (docker or podman)
 }
 
 // LoadConfig loads configuration from environment variables
@@ -32,11 +31,7 @@ func LoadConfig() (*Config, error) {
 	// Get port from environment
 	cfg.ServerPort = os.Getenv("PORT")
 
-	// Get container executable from environment
-	cfg.Executable = os.Getenv("CONTAINER_EXECUTABLE")
-	if cfg.Executable == "" {
-		cfg.Executable = "docker" // Default to docker if not specified
-	}
+	// Container executable is no longer needed as we use the Docker client library directly
 
 	// Parse images JSON from environment
 	imagesJSON := os.Getenv("CONTAINERS")

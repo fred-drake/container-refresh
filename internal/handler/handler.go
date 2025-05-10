@@ -58,12 +58,9 @@ func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Token validated. Starting container pull process...")
 
-	containerExecutable := h.Config.Executable
-	if containerExecutable == "" {
-		containerExecutable = "docker"
-	}
+	// Docker client library is used now, executable name is no longer needed
 
-	if err := docker.PullContainers(containerExecutable, h.Config.Images); err != nil {
+	if err := docker.PullContainers(h.Config.Images); err != nil {
 		log.Printf("Error pulling container images: %v", err)
 		http.Error(w, fmt.Sprintf("Failed to pull container images: %v", err), http.StatusInternalServerError)
 		return
@@ -71,7 +68,7 @@ func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("All container images pulled successfully.")
 
 	log.Println("Starting container stop process...")
-	if err := docker.StopContainers(containerExecutable, h.Config.ContainerNames); err != nil {
+	if err := docker.StopContainers(h.Config.ContainerNames); err != nil {
 		log.Printf("Error stopping containers: %v", err)
 		http.Error(w, fmt.Sprintf("Failed to stop containers: %v", err), http.StatusInternalServerError)
 		return

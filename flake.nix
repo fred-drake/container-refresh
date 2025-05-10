@@ -53,11 +53,7 @@
             description = "Path to the token file containing only the token to be used by the application.";
           };
 
-          executable = lib.mkOption {
-            type = lib.types.str;
-            default = "docker";
-            description = "The exact path to the container runtime to use.";
-          };
+          # Executable option removed as we now use the Docker client library directly
 
           images = lib.mkOption {
             type = lib.types.listOf lib.types.str;
@@ -150,7 +146,6 @@
                 [
                   "TOKEN_FILE=${cfg.tokenFile}"
                   "PORT=${cfg.port}"
-                  "CONTAINER_EXECUTABLE=${cfg.executable}"
                 ]
                 ++ lib.optionals (cfg.images != []) [
                   "CONTAINERS='${builtins.toJSON cfg.images}'"
