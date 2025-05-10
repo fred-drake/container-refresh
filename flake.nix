@@ -119,7 +119,7 @@
               PrivateDevices = true;
 
               # Allow access to Docker socket and systemd
-              SupplementaryGroups = ["docker" "systemd-journal"];
+              SupplementaryGroups = ["podman" "systemd-journal"];
               ReadWritePaths = ["/var/run/docker.sock"];
 
               # Environment setup
