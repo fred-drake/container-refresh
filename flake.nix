@@ -54,8 +54,9 @@
           };
 
           slackWebhookUrlFile = lib.mkOption {
-            type = lib.types.path;
-            description = "Path to the file containing the Slack webhook URL for notifications.";
+            type = lib.types.nullOr lib.types.path;
+            default = null;
+            description = "Optional path to the file containing the Slack webhook URL for notifications.";
           };
 
           # Executable option removed as we now use the Docker client library directly
@@ -151,6 +152,8 @@
                 [
                   "TOKEN_FILE=${cfg.tokenFile}"
                   "PORT=${cfg.port}"
+                ]
+                ++ lib.optionals (cfg.slackWebhookUrlFile != null) [
                   "SLACK_WEBHOOK_URL_FILE=${cfg.slackWebhookUrlFile}"
                 ]
                 ++ lib.optionals (cfg.images != []) [
