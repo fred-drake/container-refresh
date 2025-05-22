@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"container-refresh/internal/config"
 	"container-refresh/internal/docker"
+	"container-refresh/internal/slack"
 )
 
 // UpdateRequest defines the expected JSON body for the /update endpoint.
@@ -62,7 +64,15 @@ func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := docker.PullContainers(h.Config.Images); err != nil {
 		log.Printf("Error pulling container images: %v", err)
-		http.Error(w, fmt.Sprintf("Failed to pull container images: %v", err), http.StatusInternalServerError)
+		errorMsg := fmt.Sprintf("Failed to pull container images: %v", err)
+		http.Error(w, errorMsg, http.StatusInternalServerError)
+		
+		// Send failure notification to Slack
+		hostname, _ := os.Hostname()
+		slackMsg := fmt.Sprintf("Containers not refreshed on %s: %s", hostname, errorMsg)
+		if err := slack.SendMessage(slackMsg); err != nil {
+			log.Printf("Failed to send Slack notification: %v", err)
+		}
 		return
 	}
 	log.Println("All container images pulled successfully.")
@@ -70,7 +80,15 @@ func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Starting container stop process...")
 	if err := docker.StopContainers(h.Config.ContainerNames); err != nil {
 		log.Printf("Error stopping containers: %v", err)
-		http.Error(w, fmt.Sprintf("Failed to stop containers: %v", err), http.StatusInternalServerError)
+		errorMsg := fmt.Sprintf("Failed to stop containers: %v", err)
+		http.Error(w, errorMsg, http.StatusInternalServerError)
+		
+		// Send failure notification to Slack
+		hostname, _ := os.Hostname()
+		slackMsg := fmt.Sprintf("Containers not refreshed on %s: %s", hostname, errorMsg)
+		if err := slack.SendMessage(slackMsg); err != nil {
+			log.Printf("Failed to send Slack notification: %v", err)
+		}
 		return
 	}
 	log.Println("All containers stopped successfully.")
@@ -81,6 +99,13 @@ func (h *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error writing response: %v, bytes written: %d", err, fw)
 	}
 	log.Println("Update process completed successfully and response sent.")
+
+	// Send success notification to Slack
+	hostname, _ := os.Hostname()
+	slackMsg := fmt.Sprintf("Containers refreshed on %s", hostname)
+	if err := slack.SendMessage(slackMsg); err != nil {
+		log.Printf("Failed to send Slack notification: %v", err)
+	}
 }
 
 func min(a, b int) int {

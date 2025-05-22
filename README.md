@@ -10,7 +10,6 @@ The application is configured through environment variables:
 - `CONTAINERS`: JSON array of container image tags to pull (e.g., `'["docker.io/library/alpine:latest"]'`)
 - `CONTAINER_NAMES`: JSON array of container names to stop after pulling images (e.g., `'["my-container"]'`)
 - `PORT`: The port for the HTTP server to listen on (defaults to `8080`)
-- `CONTAINER_EXECUTABLE`: The container engine command to use (`docker` or `podman`, defaults to `docker`)
 
 ## API Endpoints
 
@@ -88,29 +87,29 @@ To deploy container-refresh as a service on a NixOS system, add the following to
   # Enable and configure the service
   services.container-refresh = {
     enable = true;
-    
+
     # Required: Path to a file containing only the token
     tokenFile = "/path/to/token/file";
-    
+
     # Required: List of container images to pull
     images = [
       "docker.io/library/nginx:latest",
       "ghcr.io/home-assistant/home-assistant:latest"
     ];
-    
+
     # Optional: List of container names to stop after pulling
     containerNames = [
       "nginx",
       "home-assistant"
     ];
-    
+
     # Optional: Change the user/group that runs the service
     # user = "container-refresh";
     # group = "container-refresh";
-    
+
     # Optional: Change the listening port
     # port = "8080";
-    
+
     # Optional: Choose container runtime (docker or podman)
     # executable = "docker";
   };
@@ -128,6 +127,7 @@ The flake provides the following outputs:
 ## Security Considerations
 
 The NixOS service is configured with security hardening:
+
 - Runs as a dedicated user with minimal privileges
 - Uses capability bounding to limit what the service can do
 - Implements various security features (ProtectSystem, PrivateTmp, etc.)

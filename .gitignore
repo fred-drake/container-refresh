@@ -10,3 +10,6 @@ devenv.local.nix
 
 target/
 result
+vendor/
+
+testwebhookurl.txt
